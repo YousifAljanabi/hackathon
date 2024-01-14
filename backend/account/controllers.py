@@ -4,7 +4,7 @@ from ninja import Router
 from .authorization import GlobalAuth, get_tokens_for_user
 from .schemas import AccountCreate, AuthOut, SigninSchema, AccountOut, AccountUpdate
 from backend.schemas import MessageOut
-
+from django.conf import settings
 User = get_user_model()
 
 account_controller = Router(tags=['auth'])
@@ -36,14 +36,15 @@ def signup(request, account_in: AccountCreate):
 
     return 400, {'detail': 'User already registered!'}
 
-
+from jose import jwt
 @account_controller.post('signin', response={
     200: AuthOut,
     404: MessageOut,
 })
+
 def signin(request, signin_in: SigninSchema):
     user = authenticate(request, email=signin_in.email, password=signin_in.password)
-    print(user)
+
     if not user:
         return 404, {'detail': 'User does not exist'}
 
@@ -53,20 +54,10 @@ def signin(request, signin_in: SigninSchema):
         'token': token,
         'account': user
     }
-
-
-
-
-
-@account_controller.get('', auth=GlobalAuth(), response=AccountOut)
-def me(request):
-    return get_object_or_404(User, id=request.auth['pk'])
-
-@account_controller.put('', auth=GlobalAuth(), response={
-    200: AccountOut,
-})
-def update_account(request, update_in: AccountUpdate):
-    User.objects.filter(id=request.auth['pk']).update(**update_in.dict())
-    return get_object_or_404(User, id=request.auth['pk'])
-
-
+@account_controller.get('check', auth=GlobalAuth(), response=AccountOut)
+def check(request):
+    user = get_object_or_404(User, pk=request.auth.get('pk'))
+    if user:
+        return 200, user
+    else:
+        return 404, {'detail': 'User does not exist'}

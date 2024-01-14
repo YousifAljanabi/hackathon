@@ -30,7 +30,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    '172.20.10.5'
+    '172.20.10.5',
+    '192.168.125.225'
 ]
 
 
@@ -49,11 +50,12 @@ INSTALLED_APPS = [
     # Internal Apps
     'backend.api',
     'backend.account',
-    'backend.chat',
+    'backend.party',
     'backend.home',
+    'backend.video',
     # External Apps
     'corsheaders',
-
+'storages',
 
 
 ]
@@ -71,7 +73,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL=True
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -144,7 +146,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -159,3 +161,4 @@ CHANNEL_LAYERS = {
         },
     },
 }
+

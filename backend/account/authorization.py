@@ -15,7 +15,7 @@ class GlobalAuth(HttpBearer):
             user_pk = jwt.decode(token=token, key=settings.SECRET_KEY, algorithms=['HS256'])
         except JWTError:
             return {'token': 'unauthorized'}
-        if user_pk:
+        if user_pk.get('pk'):
             return {'pk': str(user_pk['pk'])}
 
 

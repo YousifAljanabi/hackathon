@@ -9,24 +9,32 @@
     <textarea id="chat-log" cols="100" rows="20"></textarea><br>
     <input id="chat-message-input" type="text" size="100"><br>
     <input id="chat-message-submit" type="button" value="Send">
+
+
+    <input id="video-test" type="submit" value="Test">
+
     {{ room_name|json_script:"room-name" }}
+    <video src="data:image/jpeg;base64,{{ frame }}" controls autoplay></video>
     <script>
+
+
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
-        const chatSocket = new WebSocket(
+
+        const partySocket = new WebSocket(
             'ws://'
             + window.location.host
-            + '/ws/chat/'
+            + '/ws/party/'
             + roomName
             + '/'
         );
 
-        chatSocket.onmessage = function(e) {
+        partySocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').value += (data.message + '\n');
+            document.querySelector('#chat-log').value += (data.message + '\n') + (data.from + '\n');
         };
 
-        chatSocket.onclose = function(e) {
+        partySocket.onclose = function(e) {
             console.error('Chat socket closed unexpectedly');
         };
 
@@ -37,14 +45,41 @@
             }
         };
 
-        document.querySelector('#chat-message-submit').onclick = function(e) {
+        document.querySelector('#chat-message-submit').onclick = async function(e) {
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
-            chatSocket.send(JSON.stringify({
-                'message': message
+            partySocket.send(JSON.stringify({
+                'message': message,
+                'type': 'chat_message',
+                'from': 'user',
             }));
             messageInputDom.value = '';
-        };
+
+        }
+
+
+
     </script>
 </body>
 </html>
+
+
+{#try{#}
+{#                let response = await fetch('', {#}
+{#                    method: 'POST',#}
+{#                    body: JSON.stringify({#}
+{#                        'message': message,#}
+{#                        'room': roomName,#}
+{#                    })#}
+{#                })#}
+{#                let data = await response.json()#}
+{#                console.log(data)#}
+{#                partySocket.send(JSON.stringify({#}
+{#                    'message': message#}
+{#                }));#}
+{#                messageInputDom.value = '';#}
+{##}
+{#            }#}
+{#            catch (e){#}
+{#                console.log(e)#}
+{#            }#}
